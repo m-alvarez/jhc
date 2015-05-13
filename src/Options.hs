@@ -378,11 +378,11 @@ processOptions = do
     -- set flags based on ini options
     -- CHANGE: add flags for stub gc
     let o1 = case M.lookup "gc" inis of
-            Just "jgc" -> "JGC DETECTED" `trace` optFOptsSet_u (S.insert FlagOpts.Jgc) o
-            Just "jgc-stub" -> "STUB DETECTED" `trace` optFOptsSet_u (S.insert FlagOpts.Jgc) (optFOptsSet_u (S.insert FlagOpts.JgcStub) o)
+            Just "jgc" -> optFOptsSet_u (S.insert FlagOpts.Jgc) o
+            Just "jgc-stub" -> optFOptsSet_u (S.insert FlagOpts.Jgc) (optFOptsSet_u (S.insert FlagOpts.JgcStub) o)
             Just "boehm" -> optFOptsSet_u (S.insert FlagOpts.Boehm) o
             Just gc -> error $ "Unrecognized gc option " ++ gc
-            _ -> "NO GC OPTIONS" `trace` o
+            _ -> o
     o2 <- either putErrDie return $ postProcessFO o1
     when (FlagDump.Ini `S.member` optDumpSet o) $ do
         putStrLn (show $ optDumpSet o)

@@ -86,6 +86,8 @@ import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
 import qualified Data.Traversable as Seq
 
+import Debug.Trace (trace, traceShow, traceShowId)
+
 import Doc.DocLike
 import Util.Gen
 import Util.SetLike
@@ -153,7 +155,7 @@ stmtMapStmt f s = g s where
 -- The Bool in TB and is whether the GC needs to consider the types to
 -- possibly contain garbage collectable pointers.
 data Type = TB String Bool | TPtr Type | TAnon [Type] | TNStruct Name | TFunPtr Type [Type]
-    deriving(Eq,Ord)
+    deriving(Eq,Ord,Show)
 
 data E = ED (G Doc) | EP E | EE
 
@@ -566,6 +568,7 @@ data Structure = Structure {
     structureHasDiscriminator   :: Bool,    -- ^ the first field must appear first in the on memory layout, don't move it.
     structureAligned :: Bool                -- ^ this structure needs to be aligned to a pointer boundry, even if it woudn't be otherwise.
     }
+    deriving (Show)
 
 basicStructure = Structure {
     structureName = error "basicStructure: Name",

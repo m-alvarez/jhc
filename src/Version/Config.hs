@@ -3,11 +3,11 @@ module Version.Config where
 shortVersion = "0.8"
 version = "0.8.2"
 package = "jhc"
-libdir  = "/home/user/haskell/jhcM/install/lib"
-datadir = "/home/user/haskell/jhcM/install/share"
-host    = "i686-pc-linux-gnu"
-libraryInstall = "/home/user/haskell/jhcM/install/share/jhc-0.8"
-confDir = "/home/user/haskell/jhcM/install/etc/jhc-0.8"
+libdir  = "/usr/local/lib"
+datadir = "/usr/local/share"
+host    = "x86_64-unknown-linux-gnu"
+libraryInstall = "/usr/local/share/jhc-0.8"
+confDir = "/usr/local/etc/jhc-0.8"
 
 ho_version, version_major, version_minor, version_patch :: Int
 ho_version = 14

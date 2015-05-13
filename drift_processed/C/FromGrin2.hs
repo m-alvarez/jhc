@@ -18,6 +18,8 @@ import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Text.PrettyPrint.HughesPJ as P
 
+import Debug.Trace (trace, traceShow)
+
 import C.FFI
 import C.Generate
 import C.Prims
@@ -61,6 +63,7 @@ data TyRep
     = TyRepRawTag    -- stored raw tag
     | TyRepUntagged  -- memory, without a tag
     | TyRepRawVal !Bool   -- stored raw argument and whether it is signed
+    deriving (Show)
 
 data Env = Env {
     rTodo :: Todo,
@@ -101,11 +104,13 @@ runC grin (C m) =  (execUniq1 (runRWST m startEnv emptyHcHash),ityrep) where
     tyRep k _ | not (fopts FO.FullInt), k == cInt = Just $ TyRepRawVal True
     tyRep k TyTy { tySlots = [s], tySiblings = Just [k'] } | k == k', good s = Just $ TyRepRawVal False
     tyRep k tyty | null (tySlots tyty) = Just TyRepRawTag
-    tyRep k tyty | Just xs <- tySiblings tyty, all triv [ x | x <- xs, x /= k] = Just TyRepUntagged where
+    -- CHANGED: TODO fix this hack
+    -- preserve the optimization, but make it work
+    tyRep k tyty | Just xs <- tySiblings tyty, all triv [ x | x <- xs, x /= k], length xs <= 2 = Just TyRepUntagged where
         triv x = case mlookup x tmap of
             Just t -> null (tySlots t)
             Nothing -> False
-    tyRep _ _ = Nothing
+    tyRep k t = k `traceShow` t `traceShow` Nothing
 --    tyRep k tyty | tySiblings tyty == Just [k] = Just TyRepUntagged
     --cpr = iw `Map.union` Map.insert cChar False (Map.fromList [ (a,False) | (a,TyTy { tySlots = [s], tySiblings = Just [a'] }) <- Map.assocs tmap, a == a', isJust (good s) ])
     --iw = if fopts FO.FullInt then mempty else Map.fromList [(cInt,True), (cWord,False)]
@@ -656,7 +661,8 @@ buildConstants cpr grin fh = P.vcat (map cc (Grin.HashConst.toList fh)) where
         cd = text "static const struct" <+> tshow (nodeStructName a) <+> text "_c" <> tshow i <+> text "= {" <> hsep (punctuate P.comma (ntag ++ rs)) <> text "};"
         --Just TyTy { tySiblings = sibs } = findTyTy tyenv a
         ntag = case mlookup a cpr of
-            --Just [a'] | a' == a -> []
+            -- CHANGED TODO figure this out...
+            --Just [a'] | a == a' -> []
             Just _ -> []
             _ -> [text ".what =" <+> text "(what_t)SET_RAW_TAG(" <> tshow (nodeTagName a) <> text ")"]
         def = text "#define c" <> tshow i <+> text "(TO_SPTR_C(P_WHNF, (sptr_t)&_c" <> tshow i <> text "))"
@@ -842,16 +848,17 @@ newNode region ty ~(NodeC t as) = do
 -- declaring stuff
 ------------------
 
-declareStruct n = do
+declareStruct n = nodeStructName n `traceShow` do
     grin <- asks rGrin
     cpr <- asks rCPR
     let TyTy { tySlots = ts, tySiblings = ss } = runIdentity $ findTyTy (grinTypeEnv grin) n
     ts' <- mapM convertType ts
-    let (dis,needsDis) | tagIsSuspFunction n = ([(name "head",fptr_t)],False)
-                       | null ts = ([],False)
-                       | Just TyRepUntagged <- mlookup n cpr = ([],False)
-                       | Just [n'] <- ss, n == n' = ([],False)
-                       | otherwise = ([],True)
+    -- CHANGED
+    let (dis,needsDis) | tagIsSuspFunction n = "susp" `trace` ([(name "head",fptr_t)],False)
+                       | null ts = "null ts" `trace` ([],False)
+                       | Just TyRepUntagged <- mlookup n cpr = "just tyrepuntagged" `trace` ([],False)
+                       | Just [n'] <- ss, n == n' = "just n'" `trace` ([],False)
+                       | otherwise = "otherwise" `trace` ([],True)
         fields = (dis ++ zip [ name $ 'a':show i | i <-  [(1 :: Int) ..] ] ts')
         theStruct = basicStructure {
             structureName = nodeStructName n,
@@ -859,7 +866,7 @@ declareStruct n = do
             structureAligned = True,
             structureHasDiscriminator = not $ null dis,
             --structureNeedsDiscriminator = not (fopts FO.Jgc) &&  needsDis
-            structureNeedsDiscriminator =  needsDis
+            structureNeedsDiscriminator = needsDis
             }
     unless (null fields) $ tell mempty { wStructures = Map.singleton (structureName theStruct) theStruct }
 

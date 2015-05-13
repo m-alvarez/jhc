@@ -215,7 +215,7 @@ data TyTy = TyTy {
     tyReturn :: [Ty],
     tyThunk :: TyThunk,
     tySiblings :: Maybe [Atom]
-}
+} deriving (Show)
 
 tyTy = TyTy { tySlots = [], tyReturn = [], tySiblings = Nothing, tyThunk = TyNotThunk }
 

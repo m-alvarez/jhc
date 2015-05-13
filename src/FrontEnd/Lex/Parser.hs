@@ -14,8 +14,9 @@ import Name.Names
 import qualified Data.Map as Map
 import qualified Data.Array as Happy_Data_Array
 import qualified GHC.Exts as Happy_GHC_Exts
+import Control.Applicative(Applicative(..))
 
--- parser produced by Happy Version 1.18.9
+-- parser produced by Happy Version 1.19.4
 
 newtype HappyAbsSyn t8 t12 t14 t15 t16 t67 t68 t69 t70 t71 t72 t73 t74 t75 t76 t77 t78 t79 t80 t81 t82 t83 t84 t85 t86 t87 t88 t89 t90 t91 t92 t93 t94 t95 t96 t97 t98 t99 t100 t101 t102 t103 t104 t105 t106 t107 t108 t109 t110 t111 t112 t113 t114 t115 t116 t117 t118 t119 t120 t121 t122 t123 t124 t125 t126 t127 t128 t129 t130 t131 t132 t133 t134 t135 t136 t137 t138 t139 t144 t145 = HappyAbsSyn HappyAny
 #if __GLASGOW_HASKELL__ >= 607
@@ -4034,7 +4035,23 @@ toKindVarSym n
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 -- Id: GenericTemplate.hs,v 1.26 2005/01/14 14:47:22 simonmar Exp 
 
-{-# LINE 30 "templates/GenericTemplate.hs" #-}
+{-# LINE 13 "templates/GenericTemplate.hs" #-}
+
+
+
+
+
+-- Do not remove this comment. Required to fix CPP parsing when using GCC and a clang-compiled alex.
+#if __GLASGOW_HASKELL__ > 706
+#define LT(n,m) ((Happy_GHC_Exts.tagToEnum# (n Happy_GHC_Exts.<# m)) :: Bool)
+#define GTE(n,m) ((Happy_GHC_Exts.tagToEnum# (n Happy_GHC_Exts.>=# m)) :: Bool)
+#define EQ(n,m) ((Happy_GHC_Exts.tagToEnum# (n Happy_GHC_Exts.==# m)) :: Bool)
+#else
+#define LT(n,m) (n Happy_GHC_Exts.<# m)
+#define GTE(n,m) (n Happy_GHC_Exts.>=# m)
+#define EQ(n,m) (n Happy_GHC_Exts.==# m)
+#endif
+{-# LINE 46 "templates/GenericTemplate.hs" #-}
 
 
 data Happy_IntList = HappyCons Happy_GHC_Exts.Int# Happy_IntList
@@ -4043,11 +4060,11 @@ data Happy_IntList = HappyCons Happy_GHC_Exts.Int# Happy_IntList
 
 
 
-{-# LINE 51 "templates/GenericTemplate.hs" #-}
+{-# LINE 67 "templates/GenericTemplate.hs" #-}
 
-{-# LINE 61 "templates/GenericTemplate.hs" #-}
+{-# LINE 77 "templates/GenericTemplate.hs" #-}
 
-{-# LINE 70 "templates/GenericTemplate.hs" #-}
+{-# LINE 86 "templates/GenericTemplate.hs" #-}
 
 infixr 9 `HappyStk`
 data HappyStk a = HappyStk a (HappyStk a)
@@ -4064,9 +4081,9 @@ happyParse start_state = happyNewToken start_state notHappyAtAll notHappyAtAll
 -- parse (a %partial parser).  We must ignore the saved token on the top of
 -- the stack in this case.
 happyAccept 0# tk st sts (_ `HappyStk` ans `HappyStk` _) =
-	happyReturn1 ans
+        happyReturn1 ans
 happyAccept j tk st sts (HappyStk ans _) = 
-	(happyTcHack j (happyTcHack st)) (happyReturn1 ans)
+        (happyTcHack j (happyTcHack st)) (happyReturn1 ans)
 
 -----------------------------------------------------------------------------
 -- Arrays only: do the next action
@@ -4074,37 +4091,35 @@ happyAccept j tk st sts (HappyStk ans _) =
 
 
 happyDoAction i tk st
-	= {- nothing -}
+        = {- nothing -}
 
 
-	  case action of
-		0#		  -> {- nothing -}
-				     happyFail i tk st
-		-1# 	  -> {- nothing -}
-				     happyAccept i tk st
-		n | (n Happy_GHC_Exts.<# (0# :: Happy_GHC_Exts.Int#)) -> {- nothing -}
+          case action of
+                0#           -> {- nothing -}
+                                     happyFail i tk st
+                -1#          -> {- nothing -}
+                                     happyAccept i tk st
+                n | LT(n,(0# :: Happy_GHC_Exts.Int#)) -> {- nothing -}
 
-				     (happyReduceArr Happy_Data_Array.! rule) i tk st
-				     where rule = (Happy_GHC_Exts.I# ((Happy_GHC_Exts.negateInt# ((n Happy_GHC_Exts.+# (1# :: Happy_GHC_Exts.Int#))))))
-		n		  -> {- nothing -}
+                                                   (happyReduceArr Happy_Data_Array.! rule) i tk st
+                                                   where rule = (Happy_GHC_Exts.I# ((Happy_GHC_Exts.negateInt# ((n Happy_GHC_Exts.+# (1# :: Happy_GHC_Exts.Int#))))))
+                n                 -> {- nothing -}
 
 
-				     happyShift new_state i tk st
-				     where (new_state) = (n Happy_GHC_Exts.-# (1# :: Happy_GHC_Exts.Int#))
-   where (off)    = indexShortOffAddr happyActOffsets st
-         (off_i)  = (off Happy_GHC_Exts.+# i)
-	 check  = if (off_i Happy_GHC_Exts.>=# (0# :: Happy_GHC_Exts.Int#))
-			then (indexShortOffAddr happyCheck off_i Happy_GHC_Exts.==#  i)
-			else False
-         (action)
+                                     happyShift new_state i tk st
+                                     where new_state = (n Happy_GHC_Exts.-# (1# :: Happy_GHC_Exts.Int#))
+   where off    = indexShortOffAddr happyActOffsets st
+         off_i  = (off Happy_GHC_Exts.+# i)
+         check  = if GTE(off_i,(0# :: Happy_GHC_Exts.Int#))
+                  then EQ(indexShortOffAddr happyCheck off_i, i)
+                  else False
+         action
           | check     = indexShortOffAddr happyTable off_i
           | otherwise = indexShortOffAddr happyDefActions st
 
-{-# LINE 130 "templates/GenericTemplate.hs" #-}
-
 
 indexShortOffAddr (HappyA# arr) off =
-	Happy_GHC_Exts.narrow16Int# i
+        Happy_GHC_Exts.narrow16Int# i
   where
         i = Happy_GHC_Exts.word2Int# (Happy_GHC_Exts.or# (Happy_GHC_Exts.uncheckedShiftL# high 8#) low)
         high = Happy_GHC_Exts.int2Word# (Happy_GHC_Exts.ord# (Happy_GHC_Exts.indexCharOffAddr# arr (off' Happy_GHC_Exts.+# 1#)))
@@ -4123,13 +4138,13 @@ data HappyAddr = HappyA# Happy_GHC_Exts.Addr#
 -----------------------------------------------------------------------------
 -- HappyState data type (not arrays)
 
-{-# LINE 163 "templates/GenericTemplate.hs" #-}
+{-# LINE 170 "templates/GenericTemplate.hs" #-}
 
 -----------------------------------------------------------------------------
 -- Shifting a token
 
 happyShift new_state 0# tk st sts stk@(x `HappyStk` _) =
-     let (i) = (case Happy_GHC_Exts.unsafeCoerce# x of { (Happy_GHC_Exts.I# (i)) -> i }) in
+     let i = (case Happy_GHC_Exts.unsafeCoerce# x of { (Happy_GHC_Exts.I# (i)) -> i }) in
 --     trace "shifting the error token" $
      happyDoAction i tk new_state (HappyCons (st) (sts)) (stk)
 
@@ -4165,30 +4180,33 @@ happyReduce k i fn 0# tk st sts stk
      = happyFail 0# tk st sts stk
 happyReduce k nt fn j tk st sts stk
      = case happyDrop (k Happy_GHC_Exts.-# (1# :: Happy_GHC_Exts.Int#)) sts of
-	 sts1@((HappyCons (st1@(action)) (_))) ->
-        	let r = fn stk in  -- it doesn't hurt to always seq here...
-       		happyDoSeq r (happyGoto nt j tk st1 sts1 r)
+         sts1@((HappyCons (st1@(action)) (_))) ->
+                let r = fn stk in  -- it doesn't hurt to always seq here...
+                happyDoSeq r (happyGoto nt j tk st1 sts1 r)
 
 happyMonadReduce k nt fn 0# tk st sts stk
      = happyFail 0# tk st sts stk
 happyMonadReduce k nt fn j tk st sts stk =
-        happyThen1 (fn stk tk) (\r -> happyGoto nt j tk st1 sts1 (r `HappyStk` drop_stk))
-       where (sts1@((HappyCons (st1@(action)) (_)))) = happyDrop k (HappyCons (st) (sts))
-             drop_stk = happyDropStk k stk
+      case happyDrop k (HappyCons (st) (sts)) of
+        sts1@((HappyCons (st1@(action)) (_))) ->
+          let drop_stk = happyDropStk k stk in
+          happyThen1 (fn stk tk) (\r -> happyGoto nt j tk st1 sts1 (r `HappyStk` drop_stk))
 
 happyMonad2Reduce k nt fn 0# tk st sts stk
      = happyFail 0# tk st sts stk
 happyMonad2Reduce k nt fn j tk st sts stk =
-       happyThen1 (fn stk tk) (\r -> happyNewToken new_state sts1 (r `HappyStk` drop_stk))
-       where (sts1@((HappyCons (st1@(action)) (_)))) = happyDrop k (HappyCons (st) (sts))
-             drop_stk = happyDropStk k stk
+      case happyDrop k (HappyCons (st) (sts)) of
+        sts1@((HappyCons (st1@(action)) (_))) ->
+         let drop_stk = happyDropStk k stk
 
-             (off) = indexShortOffAddr happyGotoOffsets st1
-             (off_i) = (off Happy_GHC_Exts.+# nt)
-             (new_state) = indexShortOffAddr happyTable off_i
+             off = indexShortOffAddr happyGotoOffsets st1
+             off_i = (off Happy_GHC_Exts.+# nt)
+             new_state = indexShortOffAddr happyTable off_i
 
 
 
+          in
+          happyThen1 (fn stk tk) (\r -> happyNewToken new_state sts1 (r `HappyStk` drop_stk))
 
 happyDrop 0# l = l
 happyDrop n (HappyCons (_) (t)) = happyDrop (n Happy_GHC_Exts.-# (1# :: Happy_GHC_Exts.Int#)) t
@@ -4203,9 +4221,9 @@ happyDropStk n (x `HappyStk` xs) = happyDropStk (n Happy_GHC_Exts.-# (1#::Happy_
 happyGoto nt j tk st = 
    {- nothing -}
    happyDoAction j tk new_state
-   where (off) = indexShortOffAddr happyGotoOffsets st
-         (off_i) = (off Happy_GHC_Exts.+# nt)
-         (new_state) = indexShortOffAddr happyTable off_i
+   where off = indexShortOffAddr happyGotoOffsets st
+         off_i = (off Happy_GHC_Exts.+# nt)
+         new_state = indexShortOffAddr happyTable off_i
 
 
 
@@ -4215,8 +4233,8 @@ happyGoto nt j tk st =
 
 -- parse error if we are in recovery and we fail again
 happyFail 0# tk old_st _ stk@(x `HappyStk` _) =
-     let (i) = (case Happy_GHC_Exts.unsafeCoerce# x of { (Happy_GHC_Exts.I# (i)) -> i }) in
---	trace "failing" $ 
+     let i = (case Happy_GHC_Exts.unsafeCoerce# x of { (Happy_GHC_Exts.I# (i)) -> i }) in
+--      trace "failing" $ 
         happyError_ i tk
 
 {-  We don't need state discarding for our restricted implementation of
@@ -4225,16 +4243,16 @@ happyFail 0# tk old_st _ stk@(x `HappyStk` _) =
 
 -- discard a state
 happyFail  0# tk old_st (HappyCons ((action)) (sts)) 
-						(saved_tok `HappyStk` _ `HappyStk` stk) =
---	trace ("discarding state, depth " ++ show (length stk))  $
-	happyDoAction 0# tk action sts ((saved_tok`HappyStk`stk))
+                                                (saved_tok `HappyStk` _ `HappyStk` stk) =
+--      trace ("discarding state, depth " ++ show (length stk))  $
+        happyDoAction 0# tk action sts ((saved_tok`HappyStk`stk))
 -}
 
 -- Enter error recovery: generate an error token,
 --                       save the old token and carry on.
 happyFail  i tk (action) sts stk =
 --      trace "entering error recovery" $
-	happyDoAction 0# tk action sts ( (Happy_GHC_Exts.unsafeCoerce# (Happy_GHC_Exts.I# (i))) `HappyStk` stk)
+        happyDoAction 0# tk action sts ( (Happy_GHC_Exts.unsafeCoerce# (Happy_GHC_Exts.I# (i))) `HappyStk` stk)
 
 -- Internal happy errors:
 
@@ -4252,9 +4270,9 @@ happyTcHack x y = y
 
 -----------------------------------------------------------------------------
 -- Seq-ing.  If the --strict flag is given, then Happy emits 
---	happySeq = happyDoSeq
+--      happySeq = happyDoSeq
 -- otherwise it emits
--- 	happySeq = happyDontSeq
+--      happySeq = happyDontSeq
 
 happyDoSeq, happyDontSeq :: a -> b -> b
 happyDoSeq   a b = a `seq` b
