@@ -110,7 +110,7 @@ runC grin (C m) =  (execUniq1 (runRWST m startEnv emptyHcHash),ityrep) where
         triv x = case mlookup x tmap of
             Just t -> null (tySlots t)
             Nothing -> False
-    tyRep k t = k `traceShow` t `traceShow` Nothing
+    tyRep k t = Nothing
 --    tyRep k tyty | tySiblings tyty == Just [k] = Just TyRepUntagged
     --cpr = iw `Map.union` Map.insert cChar False (Map.fromList [ (a,False) | (a,TyTy { tySlots = [s], tySiblings = Just [a'] }) <- Map.assocs tmap, a == a', isJust (good s) ])
     --iw = if fopts FO.FullInt then mempty else Map.fromList [(cInt,True), (cWord,False)]
@@ -848,7 +848,7 @@ newNode region ty ~(NodeC t as) = do
 -- declaring stuff
 ------------------
 
-declareStruct n = nodeStructName n `traceShow` do
+declareStruct n = do
     grin <- asks rGrin
     cpr <- asks rCPR
     let TyTy { tySlots = ts, tySiblings = ss } = runIdentity $ findTyTy (grinTypeEnv grin) n
